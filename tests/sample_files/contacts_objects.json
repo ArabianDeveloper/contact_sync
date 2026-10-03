@@ -1,0 +1,34 @@
+[
+  {
+    "First Name": "Ahmed",
+    "Middle Name": "Salim",
+    "Family Name": "Al Balushi",
+    "Phone": "99123456",
+    "Email": "ahmed@example.com",
+    "Labels": "Team1,Team2"
+  },
+  {
+    "First Name": "محمد",
+    "Middle Name": "سالم",
+    "Family Name": "العلوي",
+    "Phone": "٩٩١٢٣٤٥٧",
+    "Email": "mohammed@example.com",
+    "Labels": "الفريق الأول"
+  },
+  {
+    "First Name": "Sara",
+    "Middle Name": "",
+    "Family Name": "Khan",
+    "Phone": "+968 9912 3458",
+    "Email": "sara@example.com",
+    "Labels": "Team1"
+  },
+  {
+    "First Name": "John",
+    "Middle Name": "",
+    "Family Name": "Doe",
+    "Phone": "",
+    "Email": "john@example",
+    "Labels": "Team3"
+  }
+]
