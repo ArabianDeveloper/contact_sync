@@ -1,0 +1,18 @@
+First Name,Middle Name,Family Name,Phone,Email,Labels
+Ahmed,Salim,Al Balushi,99123456,ahmed@example.com,"Team1,Team2"
+„Õ„œ,”«·„,«·⁄·ÊÌ,98123456,mohammed@example.com,«·›—Ìﬁ «·√Ê·
+sara,,khan,+968 9512 3456,sara@example.com,Team1
+JOHN,,SMITH,00968 9123 4567,john@example.com," Team3 , team3 ,Team4 "
+Omar,,Said,(968) 7212-3456,omar@example.com,"Team1,,Team2"
+Layla,,Hassan,99 123 456,layla@example.com,Team5
+Missing,Phone,Row,,missing@example.com,Team1
+Bad,Phone,Row,12345,bad@example.com,Team1
+No,Email,Row,99223456,,Team1
+Bad,Email,Row,98223456,not-an-email,Team1
+No,Labels,Row,95223456,nolabels@example.com," , "
+,,,91223456,noname@example.com,Team1
+Hidden,,Chars,˝+968 9912 3470˛,hidden@example.com,Team1
+Mixed,⁄—»Ì,Name,79123456,mixed@example.com,Team6
+Œ«·œ,,,99323456,khalid@example.com,"«·›—Ìﬁ «·À«‰Ì,«·›—Ìﬁ «·√Ê·"
+Arabic,Comma,Label,99423456,arabiccomma@example.com,«·›—Ìﬁ°«·À«·À
+,,,,x@example.com,

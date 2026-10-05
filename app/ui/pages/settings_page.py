@@ -14,7 +14,7 @@ from app.services.setup_check import run_setup_check
 from app.ui.dialogs.setup_check import SetupCheckDialog
 from app.ui.google_session import GoogleSession
 from app.ui.state import AppState
-from app.ui.widgets.common import make_label, make_muted, make_title, primary_button, secondary_button
+from app.ui.widgets.common import make_label, make_muted, make_title, primary_button, scrollable, secondary_button
 from app.ui.workers import run_in_background
 
 
@@ -34,7 +34,11 @@ class SettingsPage(QWidget):
         self._loading = False
         self._busy = False
 
-        root = QVBoxLayout(self)
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        content = QWidget()
+        outer.addWidget(scrollable(content))
+        root = QVBoxLayout(content)
         root.setContentsMargins(32, 28, 32, 24)
         root.setSpacing(14)
         root.addWidget(make_title("Settings"))

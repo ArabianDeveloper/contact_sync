@@ -25,6 +25,7 @@ def stylesheet() -> str:
     return f"""
 * {{ font-family: "{FONT_FAMILY}", "Tahoma", sans-serif; font-size: 10pt; }}
 QWidget {{ background-color: {c['background']}; color: {c['text']}; }}
+QScrollArea {{ border: none; background: transparent; }}
 QToolTip {{ background-color: {c['surface_alt']}; color: {c['text']}; border: 1px solid {c['border']}; }}
 
 QLabel {{ background: transparent; }}
@@ -91,6 +92,8 @@ QTabBar::tab {{ background: transparent; color: {c['muted']}; padding: 9px 16px;
 QTabBar::tab:selected {{ color: {c['text']}; border-bottom: 2px solid {c['accent']}; }}
 QTabBar::tab:hover {{ color: {c['text']}; }}
 
+QFrame#banner {{ background-color: {c['surface_alt']}; border: none; border-bottom: 1px solid {c['accent']}; }}
+QFrame#banner QLabel {{ background: transparent; }}
 QDialog {{ background-color: {c['background']}; }}
 QTextEdit {{ background-color: {c['surface']}; border: 1px solid {c['border']}; border-radius: 8px; padding: 6px;
     font-family: "Consolas", "Segoe UI", monospace; font-size: 9pt; }}

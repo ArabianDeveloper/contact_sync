@@ -6,7 +6,7 @@ APP_DIR_NAME = "ContactSync"
 VERSION = "1.0.0"
 
 # "owner/name" of the public GitHub repository, used by the update check (stage 8).
-GITHUB_REPO: str | None = None
+GITHUB_REPO: str | None = "ArabianDeveloper/contact_sync"
 
 DEFAULT_REGION = "OM"      # Oman (+968)
 PREVIEW_ROWS = 100         # rows shown in the preview table

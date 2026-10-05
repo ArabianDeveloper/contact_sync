@@ -5,8 +5,8 @@ from typing import Iterable, Sequence
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QAbstractItemView, QFrame, QHeaderView, QLabel, QPushButton, QTableWidget, QTableWidgetItem,
-    QVBoxLayout,
+    QAbstractItemView, QFrame, QHeaderView, QLabel, QPushButton, QScrollArea, QTableWidget,
+    QTableWidgetItem, QVBoxLayout, QWidget,
 )
 
 MAX_COLUMN_WIDTH = 320
@@ -56,6 +56,16 @@ class StatCard(QFrame):
 
     def set_value(self, value) -> None:
         self._value.setText(str(value))
+
+
+def scrollable(content: QWidget) -> QScrollArea:
+    """Put a page in a scroll area, so it can never be taller than the window."""
+    area = QScrollArea()
+    area.setWidgetResizable(True)
+    area.setFrameShape(QFrame.Shape.NoFrame)
+    area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+    area.setWidget(content)
+    return area
 
 
 def make_table() -> QTableWidget:

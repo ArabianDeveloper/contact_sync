@@ -2,11 +2,13 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import (
     QHBoxLayout, QListWidget, QListWidgetItem, QMessageBox, QStackedWidget, QVBoxLayout, QWidget,
 )
 
 from app.config import APP_NAME, VERSION
+from app.update_check import check_for_update
 from app.ui.google_session import GoogleSession
 from app.ui.pages.import_page import ImportPage
 from app.ui.pages.mapping_page import MappingPage
@@ -14,6 +16,8 @@ from app.ui.pages.results_page import ResultsPage
 from app.ui.pages.settings_page import SettingsPage
 from app.ui.pages.source_page import SourcePage
 from app.ui.pages.validation_page import ValidationPage
+from app.ui.widgets.update_banner import UpdateBanner
+from app.ui.workers import run_in_background
 from app.ui.state import (
     IMPORT, MAPPING, RESULTS, SETTINGS, SOURCE, STEP_TITLES, VALIDATION, AppState,
 )
@@ -24,14 +28,13 @@ _DISABLED = Qt.ItemFlag.NoItemFlags
 
 
 class MainWindow(QWidget):
-    def __init__(self, state: AppState, session: GoogleSession | None = None):
+    def __init__(self, state: AppState, session: GoogleSession | None = None, check_updates: bool = False):
         super().__init__()
         self.state = state
         self.session = session or GoogleSession(lambda: state.settings.credentials_path)
         self._close_when_done = False
         self.setWindowTitle(f"{APP_NAME} {VERSION}")
-        self.resize(1180, 780)
-        self.setMinimumSize(940, 640)
+        self._fit_to_screen()
 
         root = QHBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
@@ -66,7 +69,15 @@ class MainWindow(QWidget):
         for page in (self.source_page, self.mapping_page, self.validation_page,
                      self.import_page, self.results_page, self.settings_page):
             self.pages.addWidget(page)
-        root.addWidget(self.pages, 1)
+
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.setSpacing(0)
+        self.update_banner = UpdateBanner()
+        content_layout.addWidget(self.update_banner)
+        content_layout.addWidget(self.pages, 1)
+        root.addWidget(content, 1)
 
         # navigation
         self.steps.currentRowChanged.connect(self._row_changed)
@@ -85,6 +96,21 @@ class MainWindow(QWidget):
 
         self._refresh_sidebar()
         self.steps.setCurrentRow(SOURCE)
+
+        if check_updates:
+            # silent: if the check fails there is nothing to show
+            run_in_background(check_for_update, self.update_banner.show_update, lambda message: None)
+
+    def _fit_to_screen(self) -> None:
+        """The window is never bigger than the usable part of the screen."""
+        width, height = 1180, 780
+        screen = QGuiApplication.primaryScreen()
+        if screen is not None:
+            area = screen.availableGeometry()
+            width = min(width, int(area.width() * 0.94))
+            height = min(height, int(area.height() * 0.92))
+        self.setMinimumSize(min(860, width), min(520, height))
+        self.resize(width, height)
 
     # -------------------------------------------------------------- navigation
 

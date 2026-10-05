@@ -1,0 +1,5 @@
+﻿First Name,Middle Name,Family Name,Phone,Email,Labels
+Test,,Alpha,71000001,YOUR_TEST_USER_1@yourdomain.com,"ZZ-Test-A,ZZ-Test-B"
+Test,,Beta,71000002,YOUR_TEST_USER_2@yourdomain.com,ZZ-Test-A
+اختبار,,تجريبي,71000003,YOUR_TEST_USER_1@yourdomain.com,ZZ-اختبار
+Test,,Alpha Again,71000001,YOUR_TEST_USER_1@yourdomain.com,ZZ-Test-C

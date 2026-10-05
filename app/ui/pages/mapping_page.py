@@ -5,13 +5,13 @@ import copy
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
-    QCheckBox, QComboBox, QGridLayout, QHBoxLayout, QListWidget, QListWidgetItem, QVBoxLayout, QWidget,
+    QCheckBox, QComboBox, QHBoxLayout, QListWidget, QListWidgetItem, QVBoxLayout, QWidget,
 )
 
 from app.core.pipeline import process_table
 from app.ui.state import AppState
 from app.ui.widgets.common import (
-    fill_table, make_label, make_muted, make_table, make_title, primary_button, secondary_button,
+    fill_table, make_label, make_muted, make_table, make_title, primary_button, scrollable, secondary_button,
 )
 from app.ui.workers import run_in_background
 
@@ -29,8 +29,13 @@ class MappingPage(QWidget):
         self._loading = False
         self._busy = False
 
-        root = QVBoxLayout(self)
-        root.setContentsMargins(32, 28, 32, 24)
+        # The content scrolls; the Back / Next buttons stay visible below it.
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        outer.setSpacing(0)
+        content = QWidget()
+        root = QVBoxLayout(content)
+        root.setContentsMargins(32, 28, 32, 12)
         root.setSpacing(14)
         root.addWidget(make_title("Mapping"))
         root.addWidget(make_muted("Choose the column of each field. The name can be built from several columns, "
@@ -38,56 +43,57 @@ class MappingPage(QWidget):
         self.profile_label = make_label("", "success")
         root.addWidget(self.profile_label)
 
-        grid = QGridLayout()
-        grid.setHorizontalSpacing(24)
-        grid.setVerticalSpacing(10)
-
-        # name columns
-        grid.addWidget(make_label("Name columns", "sectionTitle"), 0, 0)
-        name_box = QVBoxLayout()
-        name_box.setSpacing(12)
+        # --- name columns: the list on the left, its buttons on the right
+        root.addWidget(make_label("Name columns", "sectionTitle"))
+        name_row = QHBoxLayout()
+        name_row.setSpacing(14)
         self.name_list = QListWidget()
-        self.name_list.setMinimumHeight(110)
-        self.name_list.setMaximumHeight(150)
-        name_box.addWidget(self.name_list)
+        self.name_list.setFixedHeight(128)
+        name_row.addWidget(self.name_list, 1)
+
+        side = QVBoxLayout()
+        side.setSpacing(10)
+        self.up_button = secondary_button("Move up")
+        self.down_button = secondary_button("Move down")
+        self.remove_button = secondary_button("Remove")
+        self.up_button.clicked.connect(lambda: self._move_name_column(-1))
+        self.down_button.clicked.connect(lambda: self._move_name_column(1))
+        self.remove_button.clicked.connect(self._remove_name_column)
+        for button in (self.up_button, self.down_button, self.remove_button):
+            button.setMinimumWidth(120)
+            side.addWidget(button)
+        side.addStretch(1)
+        name_row.addLayout(side)
+        root.addLayout(name_row)
+
         add_row = QHBoxLayout()
         add_row.setSpacing(10)
         self.add_combo = QComboBox()
-        self.add_button = secondary_button("Add")
+        self.add_button = secondary_button("Add column to the name")
         self.add_button.clicked.connect(self._add_name_column)
         add_row.addWidget(self.add_combo, 1)
         add_row.addWidget(self.add_button)
-        name_box.addLayout(add_row)
-        buttons = QHBoxLayout()
-        buttons.setSpacing(10)
-        buttons.setContentsMargins(0, 6, 0, 0)
-        self.remove_button = secondary_button("Remove")
-        self.up_button = secondary_button("Move up")
-        self.down_button = secondary_button("Move down")
-        self.remove_button.clicked.connect(self._remove_name_column)
-        self.up_button.clicked.connect(lambda: self._move_name_column(-1))
-        self.down_button.clicked.connect(lambda: self._move_name_column(1))
-        for button in (self.remove_button, self.up_button, self.down_button):
-            buttons.addWidget(button)
-        buttons.addStretch(1)
-        name_box.addLayout(buttons)
-        grid.addLayout(name_box, 0, 1)
+        root.addLayout(add_row)
 
-        # single columns
+        # --- phone, email, labels side by side
+        fields = QHBoxLayout()
+        fields.setSpacing(16)
         self.phone_combo = QComboBox()
         self.email_combo = QComboBox()
         self.labels_combo = QComboBox()
-        for row, (caption, combo) in enumerate(
-            (("Phone", self.phone_combo), ("Email", self.email_combo), ("Labels", self.labels_combo)), start=1
-        ):
-            grid.addWidget(make_label(caption, "sectionTitle"), row, 0)
-            grid.addWidget(combo, row, 1)
+        for caption, combo in (("Phone", self.phone_combo), ("Email", self.email_combo),
+                               ("Labels", self.labels_combo)):
+            column = QVBoxLayout()
+            column.setSpacing(6)
+            column.addWidget(make_label(caption, "sectionTitle"))
+            column.addWidget(combo)
+            fields.addLayout(column, 1)
             combo.currentIndexChanged.connect(self._store)
-        grid.setColumnStretch(1, 1)
-        root.addLayout(grid)
+        root.addLayout(fields)
 
-        # name cleanup
+        # --- name cleanup
         cleanup = QHBoxLayout()
+        cleanup.setSpacing(16)
         cleanup.addWidget(make_label("English name cleanup", "sectionTitle"))
         self.trim_check = QCheckBox("Trim spaces")
         self.collapse_check = QCheckBox("Remove extra spaces")
@@ -102,13 +108,18 @@ class MappingPage(QWidget):
 
         root.addWidget(make_label("Sample: the first rows as they will be imported", "sectionTitle"))
         self.sample_table = make_table()
-        self.sample_table.setMinimumHeight(190)
+        self.sample_table.setMinimumHeight(150)
         root.addWidget(self.sample_table, 1)
 
         self.status_label = make_label("", "warning", wrap=True)
         root.addWidget(self.status_label)
 
-        bottom = QHBoxLayout()
+        outer.addWidget(scrollable(content), 1)
+
+        # --- bottom bar (always visible)
+        bar = QWidget()
+        bottom = QHBoxLayout(bar)
+        bottom.setContentsMargins(32, 10, 32, 20)
         self.back_button = secondary_button("Back")
         self.back_button.clicked.connect(self.back_requested.emit)
         self.next_button = primary_button("Next: Validation")
@@ -116,7 +127,7 @@ class MappingPage(QWidget):
         bottom.addWidget(self.back_button)
         bottom.addStretch(1)
         bottom.addWidget(self.next_button)
-        root.addLayout(bottom)
+        outer.addWidget(bar)
 
     # ------------------------------------------------------------------- state
 
