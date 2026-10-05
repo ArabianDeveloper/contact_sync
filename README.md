@@ -171,9 +171,9 @@ An unexpected error is written to the log file and shown in a message box, becau
 
 ### Publishing a new version
 
-1. Change `VERSION` in `app/config.py` (for example `1.0.1`) and run `python build_exe.py`.
-2. On GitHub, create a release with the tag `v1.0.1` and attach `ContactSync-Setup-1.0.1.exe`.
-3. Programs that are already installed show the update banner the next time they start.
+The full steps are in [RELEASING.md](RELEASING.md). In short: change `VERSION` in `app/config.py`, add a section to
+[CHANGELOG.md](CHANGELOG.md), run `python build_exe.py`, and publish a GitHub release tagged `v<version>` with the installer attached.
+Programs that are already installed show the update banner the next time they start.
 
 ## Updates
 
@@ -213,6 +213,7 @@ The sample files used by the tests are in `tests/sample_files`.
 ```
 main.py                     starts the window
 build_exe.py, contact_sync.spec, installer/, assets/     build the .exe and the installer, and the icon
+README.md, TESTING.md, RELEASING.md, CHANGELOG.md        documentation
 inspect_file.py, validate_file.py, google_check.py, google_try.py, run_import.py   command line tools
 requirements.txt, requirements-dev.txt, requirements-build.txt
 app/

@@ -78,6 +78,18 @@ class FilesTests(unittest.TestCase):
             self.assertIn(library, main)
 
 
+class ReleaseFilesTests(unittest.TestCase):
+    def test_the_changelog_has_a_section_for_the_current_version(self):
+        changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+        self.assertRegex(changelog, r"(?m)^## \[" + re.escape(VERSION) + r"\]")
+
+    def test_release_documents_exist_and_are_linked(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        for name in ("RELEASING.md", "TESTING.md", "CHANGELOG.md"):
+            self.assertTrue((ROOT / name).is_file(), name)
+            self.assertIn(name, readme)
+
+
 class RuntimeHelpersTests(unittest.TestCase):
     def test_resource_path(self):
         self.assertTrue(resource_path("assets/icon.ico").is_file())
